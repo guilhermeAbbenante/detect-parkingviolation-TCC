@@ -1,0 +1,11 @@
+resultados/
+resultadoUnico/
+
+model/best.pt
+*.pt
+
+__pycache__/
+*.pyc
+
+.venv/
+venv/
