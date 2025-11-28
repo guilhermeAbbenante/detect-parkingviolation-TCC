@@ -21,7 +21,7 @@ VEHICLE_CLASS = 'carro'
 RELATIONAL_CLASS = 'placa_proibido'
 
 PROHIBITED_ZONES = [
-    'calcada', 'faixa_pedestre', 'guia_amarela', 'guia_rebaixada', 'rampa'
+    'calcada', 'faixa_pedestre'
 ]
 
 #CONFIGURAÇÕES ESPECÍFICAS DE MÁSCARAS
@@ -86,9 +86,6 @@ def get_violation_text(class_name: str) -> Tuple[str, str]:
     data = {
         'calcada': ("Estacionado na Calcada", "Grave"),
         'faixa_pedestre': ("Estacionado na Faixa", "Grave"),
-        'guia_rebaixada': ("Obstruindo Garagem", "Média"),
-        'guia_amarela': ("Local Proibido (Guia Amarela)", "Média"),
-        'rampa': ("Estacionado na Rampa", "Grave"),
         'placa_proibido': ("Estacionado sob Placa Proibida", "Grave")
     }
     return data.get(class_name, (f"Estacionado em {class_name}", "Grave"))
@@ -184,13 +181,6 @@ def check_ground_violations(car: Dict, zones: Dict):
                     violation_detected = True
                     prioridade = 2  # ALTERADO: Diminuí para 2 (Menor que faixa)
                     detalhe = f"Calcada: {overlap}px"
-        
-        else:
-            overlap = np.sum(np.logical_and(car['mask'], combined_zone))
-            if overlap > THRESHOLDS['outros']:
-                violation_detected = True
-                prioridade = 1
-                detalhe = f"Inv. {cls_name}: {overlap}px"
 
         if violation_detected:
             if best_violation is None or prioridade > best_violation['prio']:
