@@ -223,16 +223,18 @@ def analyze_infractions(data: Dict) -> List[Dict]:
 # ==============================================================================
 
 def draw_visuals(frame: np.ndarray, cars: List[Dict], zones: Dict, plates: List[Dict]) -> Tuple[np.ndarray, str]:
-    if not cars:
-        return frame, "NONECAR"
-
-    primary_car = max(cars, key=lambda c: c['area'])
-    primary_id = primary_car['id']
+    primary_id = None
     
-    if primary_car['infractions']:
-        status_key = primary_car['infractions'][0]['class_name']
+    if not cars:
+        status_key = "NONECAR"
     else:
-        status_key = "OK"
+        primary_car = max(cars, key=lambda c: c['area'])
+        primary_id = primary_car['id']
+        
+        if primary_car['infractions']:
+            status_key = primary_car['infractions'][0]['class_name']
+        else:
+            status_key = "OK"
 
     for car in cars:
         is_primary = (car['id'] == primary_id)
@@ -298,9 +300,10 @@ def process_image(frame: np.ndarray, model: YOLO) -> Tuple[np.ndarray, Set[str],
     results = model(frame, verbose=False)[0]
     parsed_data = parse_detections(results, w, h)
     
-    if not parsed_data['cars']:
-        return display_frame, parsed_data['detected_classes'], "NONECAR"
-
+    # --- REMOVIDO O BLOCO IF ABAIXO ---
+    # if not parsed_data['cars']:
+    #     return display_frame, parsed_data['detected_classes'], "NONECAR"
+    
     processed_cars = analyze_infractions(parsed_data)
     final_frame, status_key = draw_visuals(display_frame, processed_cars, parsed_data['zones'], parsed_data['plates'])
 
